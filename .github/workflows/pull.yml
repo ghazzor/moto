@@ -1,18 +1,29 @@
-name: pull
-on: push
-permissions:
-  contents: write
+name: Pull and Push Changes
+
+on:
+  push:
+    branches:
+      - main
+
 jobs:
-  report:
+  pull-and-push:
     runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v4
-      - name: Create report file
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Clone Motorola kernel repository
         run: git clone https://github.com/MotorolaMobilityLLC/kernel-msm.git -b MMI-U1TCS34.22-64-6-1
-      - name: Commit report
+      
+      - name: Configure Git
         run: |
-          git switch -c master1
+          cd kernel-msm
           git config --global user.name 'ghazzor'
           git config --global user.email '127341071+ghazzor@users.noreply.github.com'
-          git commit -am "Automated report"
-          git push
+
+      - name: Push changes to another repository
+        run: |
+          git switch -c master1
+          git remote add destination git@github.com:ghazzor/moto.git
+          git push destination master1
